@@ -56,7 +56,6 @@ class SingleLinkedList {
 		}
 
 		BasicIterator& operator++() noexcept {
-			assert(node_->next_node != nullptr);
 			assert(node_ != nullptr)
 			node_ = node_->next_node;
 			return *this;
@@ -126,11 +125,10 @@ public:
 	}
 
 	void Clear() noexcept {
-		auto* iter{ head_.next_node };
-		while (iter != nullptr) {
-			DeleteNode(iter);
+		while (head_.next_node != nullptr) {
+			PopFront();
 		}
-		head_.next_node = nullptr;
+
 		size_ = 0;
 	}
 
@@ -157,36 +155,34 @@ public:
 	// Проверять валидность фиктивного нода
 	// Пожалуй нет
 	Iterator InsertAfter(ConstIterator pos, const Type& value) {
-		auto* iter{ &head_ };
+		Iterator iter{ before_begin() };
 
-		while (ConstIterator(iter) != pos) {
-			assert(iter->next_node != nullptr);
-			iter = iter->next_node;
+		while (iter != pos) {
+			++iter;
 		}
 
-		iter->next_node = new Node{ value, iter->next_node };
+		iter.node_.next_node = new Node{ value, iter->next_node };
 		++size_;
 
-		return Iterator(iter->next_node);
+		return iter.node_->next_node;
 	}
 
 	void PopFront() noexcept {
-		DeleteNode(head_.next_node);
+		EraseAfter(ConstIterator(head.next_node))
 		--size_;
 	}
 
 	Iterator EraseAfter(ConstIterator pos) noexcept {
-		auto* iter{ &head_ };
+		Iterator iter{ before_begin() };
 
-		while (ConstIterator(iter) != pos) {
-			assert(iter->next_node != nullptr);
-			iter = iter->next_node;
+		while (iter != pos) {
+			++iter;
 		}
 
-		DeleteNode(iter->next_node);
+		DeleteNode(iter.node_->next_node);
 		--size_;
 
-		return Iterator(iter->next_node);
+		return iter.node_->next_node;
 	}
 
 	[[nodiscard]] Iterator begin() noexcept {
@@ -236,11 +232,11 @@ private:
 		node = node->next_node;
 		delete to_delete;
 	}
-	void CreateList(const std::vector<Type> elements) {
-		auto* temp{ &head_ };
+	void CreateList(const std::vector<Type>& elements) {
+		Iterator iter{ before_begin()};
 		for (const auto& value : elements) {
-			temp->next_node = new Node{ value, nullptr };
-			temp = temp->next_node;
+			iter.node_->next_node = new Node{ value, nullptr };
+			++iter;
 		}
 	}
 private:
