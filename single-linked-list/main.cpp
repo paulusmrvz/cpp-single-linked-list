@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 
 #include "single-linked-list.h"
 
@@ -147,4 +148,6 @@ void Test() {
 
 int main() {
     Test();
+    std::cout << "All is fine!\n";
+    system("pause");
 }
