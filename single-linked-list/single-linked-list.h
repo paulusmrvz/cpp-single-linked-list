@@ -155,16 +155,10 @@ public:
 	// Проверять валидность фиктивного нода
 	// Пожалуй нет
 	Iterator InsertAfter(ConstIterator pos, const Type& value) {
-		Iterator iter{ before_begin() };
-
-		while (iter != pos) {
-			++iter;
-		}
-
-		iter.node_.next_node = new Node{ value, iter->next_node };
+		pos.node_->next_node = new Node{ value, iter->next_node };
 		++size_;
 
-		return iter.node_->next_node;
+		return pos.node_->next_node;
 	}
 
 	void PopFront() noexcept {
@@ -173,16 +167,10 @@ public:
 	}
 
 	Iterator EraseAfter(ConstIterator pos) noexcept {
-		Iterator iter{ before_begin() };
-
-		while (iter != pos) {
-			++iter;
-		}
-
-		DeleteNode(iter.node_->next_node);
+		DeleteNode(pos.node_->next_node);
 		--size_;
 
-		return iter.node_->next_node;
+		return pos.node_->next_node;
 	}
 
 	[[nodiscard]] Iterator begin() noexcept {
@@ -235,7 +223,7 @@ private:
 	void CreateList(const std::vector<Type>& elements) {
 		Iterator iter{ before_begin()};
 		for (const auto& value : elements) {
-			iter.node_->next_node = new Node{ value, nullptr };
+			InsertAfter(iter);
 			++iter;
 		}
 	}
